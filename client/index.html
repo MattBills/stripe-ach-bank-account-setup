@@ -1,11 +1,145 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    hello home page
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Home</title>
+    <!-- stripe css -->
+    <link
+      href="https://stripe-samples.github.io/developer-office-hours/demo.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <div id="main">
+      <div id="checkout">
+        <div id="payment-form">
+          <h1>Connect Bank Account</h1>
+          <h3>With plaid</h3>
+          <button id="link-button">
+            Connect Bank Account
+          </button>
+          <!-- debug  -->
+          <div id="debug-message"></div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+    <script type="text/javascript">
+      //
+      //
+      //
+      fetch('/link-token')
+        .then((res) => res.json())
+        .then((data) => {
+          console.log('Success:', data);
+          registerDebugMessage('Fetched and parsed keys!');
+          registerLinkHandler(data.link_token);
+        })
+        .catch((error) => {
+          registerDebugMessage('Error fetching keys!!!');
+          console.log('Error:', error);
+        });
+      //
+      //
+      //
+
+      // Link handler registrator
+      const registerLinkHandler = (linkToken) => {
+        console.log('registering...');
+        const linkHandler = Plaid.create({
+          token: linkToken,
+          onLoad: (arg) => {
+            console.log(
+              'link module finished loading',
+              arg
+            );
+          },
+          // SUCCESS
+          onSuccess: (public_token, metadata) => {
+            console.log(metadata);
+
+            registerDebugMessage(
+              'Plaid link set up SUCCESS!'
+            );
+
+            console.log('Public token:', public_token);
+            console.log(
+              'Account:',
+              metadata.accounts[0].id
+            );
+
+            exchangeTokens(
+              public_token,
+              // TODO: BEWARE of this implementation
+              metadata.accounts[0].id
+            );
+          },
+          // FAILURE
+          onExit: (error, metadata) => {
+            // The user exited the Link flow
+            registerDebugMessage(
+              'Plaid link set up FAILURE...'
+            );
+            console.log(error);
+            if (error != null) {
+              // the user encountered a Plaid API error prior exiting
+              console.log(
+                'Plaid API error encountered prior to exiting'
+              );
+            }
+          },
+        });
+
+        console.log(linkHandler);
+
+        // register link handler as click handler of button
+        document
+          .getElementById('link-button')
+          .addEventListener('click', () =>
+            linkHandler.open()
+          );
+      };
+
+      // Debug messenger
+      const registerDebugMessage = (message) => {
+        const debugMessage =
+          document.getElementById('debug-message');
+        debugMessage.innerText += '\n' + message;
+      };
+
+      // Token Exchange
+      const exchangeTokens = (publicToken, accountId) => {
+        registerDebugMessage('exchanging tokens...');
+
+        fetch('/exchange-tokens', {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+          },
+          body: JSON.stringify({
+            publicToken,
+            accountId,
+          }),
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            console.log('Success:', res);
+            registerDebugMessage(
+              'Exhanged tokens successfully!'
+            );
+          })
+          .catch((error) => {
+            registerDebugMessage(
+              'Error exchanging tokens!'
+            );
+            console.log('Error:', error);
+          });
+      };
+    </script>
+  </body>
 </html>

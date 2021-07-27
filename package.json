@@ -32,5 +32,8 @@
     "express": "^4.17.1",
     "plaid": "^8.5.2",
     "stripe": "^8.165.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.3.2"
   }
 }
