@@ -1,0 +1,36 @@
+{
+  "name": "ach-bank-account-setup",
+  "version": "1.0.0",
+  "description": "ACH Bank Account Set up with stripe. Includes manual verification and automatic verification with Plaid.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/dieguiviti/stripe-ach-bank-account-setup.git"
+  },
+  "keywords": [
+    "Stripe",
+    "Plaid",
+    "ACH",
+    "Direct",
+    "Debit",
+    "Bank",
+    "Verification",
+    "Bank",
+    "Authorization"
+  ],
+  "author": "Diego Gallovich",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dieguiviti/stripe-ach-bank-account-setup/issues"
+  },
+  "homepage": "https://github.com/dieguiviti/stripe-ach-bank-account-setup#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "plaid": "^8.5.2",
+    "stripe": "^8.165.0"
+  }
+}
